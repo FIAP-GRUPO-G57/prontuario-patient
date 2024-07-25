@@ -35,7 +35,7 @@ resource "aws_lambda_function" "flask_lambda" {
   runtime       = "python3.12"
   filename      = "lambda_function_payload.zip"
 
-  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+  source_code_hash =  filebase64sha256("lambda_function_payload.zip")
 
   environment {
     variables = {
