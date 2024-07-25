@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  FlaskAppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      CodeUri: .
+      MemorySize: 128
+      Timeout: 10
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref S3Bucket
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - S3CrudPolicy:
+            BucketName: !Ref S3Bucket
+      Events:
+        UploadApi:
+          Type: Api
+          Properties:
+            Path: /upload
+            Method: post
+        ListFilesApi:
+          Type: Api
+          Properties:
+            Path: /files
+            Method: get
+        DownloadApi:
+          Type: Api
+          Properties:
+            Path: /download/{filename}
+            Method: get
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: bucketpront
