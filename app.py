@@ -10,14 +10,14 @@ import uuid
 app = Flask(__name__)
 
 s3 = boto3.client('s3')
-BUCKET_NAME = os.environ.get('BUCKET_NAME', 'bucketpront')
+BUCKET_NAME = os.environ.get('BUCKET_NAME', 'prontuariopatient')
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'dependencies'))
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/upload/<foldername>', methods=['POST'])
+def upload_file(foldername):
     file = request.files['file']
-    file_key = f"uploads/{uuid.uuid4()}-{file.filename}"
+    file_key = f"{foldername}/{uuid.uuid4()}-{file.filename}"
 
     try:
         s3.upload_fileobj(file, BUCKET_NAME, file_key)
@@ -26,23 +26,24 @@ def upload_file():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/files', methods=['GET'])
-def list_files():
+@app.route('/files/<foldername>', methods=['GET'])
+def list_files(foldername):
     try:
-        response = s3.list_objects_v2(Bucket=BUCKET_NAME)
+        response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=foldername)
         files = [obj['Key'] for obj in response.get('Contents', [])]
         return jsonify({'files': files})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/download/<filename>', methods=['GET'])
-def download_file(filename):
+@app.route('/download/<foldername>/<filename>', methods=['GET'])
+def download_file(foldername, filename):
     try:
-        file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=filename)
+        object_key = f"{foldername}/{filename}"
+        file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
         return send_file(
             file_obj['Body'],
-            download_name=filename,
+            download_name=object_key,
             as_attachment=True
         )
     except Exception as e:
