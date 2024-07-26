@@ -13,5 +13,5 @@ variable "bucket_name" {
 variable "function_name" {
   description = "Lambda function name"
   type        = string
-  default     = "flask-lambda-function"
+  default     = "prontuario-lambda-function"
 }

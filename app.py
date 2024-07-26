@@ -14,8 +14,9 @@ BUCKET_NAME = os.environ.get('BUCKET_NAME', 'prontuariopatient')
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'dependencies'))
 
-@app.route('/upload/<foldername>', methods=['POST'])
-def upload_file(foldername):
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    foldername = request.args.get('user')
     file = request.files['file']
     file_key = f"{foldername}/{uuid.uuid4()}-{file.filename}"
 
@@ -26,9 +27,10 @@ def upload_file(foldername):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/files/<foldername>', methods=['GET'])
-def list_files(foldername):
+@app.route('/files', methods=['GET'])
+def list_files():
     try:
+        foldername = request.args.get('user')
         response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=foldername)
         files = [obj['Key'] for obj in response.get('Contents', [])]
         return jsonify({'files': files})
@@ -36,9 +38,10 @@ def list_files(foldername):
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/download/<foldername>/<filename>', methods=['GET'])
-def download_file(foldername, filename):
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
     try:
+        foldername = request.args.get('user')
         object_key = f"{foldername}/{filename}"
         file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
         return send_file(
