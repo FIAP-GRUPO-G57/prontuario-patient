@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements.txt -t dependencies
 
       - name: Package Lambda function
-        run: zip -r lambda_function_payload.zip .
+        run: zip -r lambda_function_payload.zip app.py dependencies/*
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
