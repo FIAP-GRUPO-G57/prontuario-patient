@@ -33,10 +33,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Upload to S3
-        run: |
-          aws s3 cp lambda_function_payload.zip s3://artefacttbucket/path/to/lambda_function_payload.zip
-
       - name: Deploy Lambda function
         run: |
-          aws lambda update-function-code --function-name prontuario-lambda-function --s3-bucket artefacttbucket --s3-key path/to/lambda_function_payload.zip
+          aws lambda update-function-code --function-name prontuario-lambda-function --zip-file fileb://lambda_function_payload.zip
