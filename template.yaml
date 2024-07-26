@@ -30,7 +30,7 @@ Resources:
         DownloadApi:
           Type: Api
           Properties:
-            Path: /download/{filename}
+            Path: /download
             Method: get
 
   S3Bucket:

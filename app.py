@@ -38,9 +38,10 @@ def list_files():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/download/<filename>', methods=['GET'])
-def download_file(filename):
+@app.route('/download', methods=['GET'])
+def download_file():
     try:
+        filename = request.args.get('filename')
         foldername = request.args.get('user')
         object_key = f"{foldername}/{filename}"
         file_obj = s3.get_object(Bucket=BUCKET_NAME, Key=object_key)
